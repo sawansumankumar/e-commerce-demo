@@ -1,9 +1,9 @@
 package com.ecommerce.service;
 
 
-import com.ecommerce.dto.CreateProductRequest;
-import com.ecommerce.dto.ProductResponse;
-import com.ecommerce.dto.UpdateProductRequest;
+import com.ecommerce.dto.request.CreateProductRequest;
+import com.ecommerce.dto.response.ProductResponse;
+import com.ecommerce.dto.request.UpdateProductRequest;
 import com.ecommerce.exception.DuplicateSkuException;
 import com.ecommerce.exception.ProductNotFoundException;
 import com.ecommerce.exception.ProductsNotFoundException;

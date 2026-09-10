@@ -1,14 +1,12 @@
 package com.ecommerce.service;
 
 
-import com.ecommerce.dto.InventoryResponse;
-import com.ecommerce.dto.UpdateInventoryRequest;
+import com.ecommerce.dto.response.InventoryResponse;
+import com.ecommerce.dto.request.UpdateInventoryRequest;
 import com.ecommerce.exception.InventoryNotFoundException;
 import com.ecommerce.model.Inventory;
 import com.ecommerce.repository.InventoryRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 
 @Service

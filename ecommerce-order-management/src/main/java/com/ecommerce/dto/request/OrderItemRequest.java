@@ -1,18 +1,19 @@
-package com.ecommerce.dto;
-
+package com.ecommerce.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class UpdateInventoryRequest {
-
+public class OrderItemRequest {
 
     @NotNull
-    @PositiveOrZero
+    private Long productId;
+
+    @NotNull
+    @Positive
     private int quantity;
 }

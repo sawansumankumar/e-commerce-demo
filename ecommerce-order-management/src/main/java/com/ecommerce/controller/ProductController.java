@@ -1,14 +1,12 @@
 package com.ecommerce.controller;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 
-import com.ecommerce.dto.CreateProductRequest;
-import com.ecommerce.dto.ProductResponse;
-import com.ecommerce.dto.UpdateProductRequest;
-import com.ecommerce.model.Product;
+import com.ecommerce.dto.request.CreateProductRequest;
+import com.ecommerce.dto.response.ProductResponse;
+import com.ecommerce.dto.request.UpdateProductRequest;
 import com.ecommerce.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

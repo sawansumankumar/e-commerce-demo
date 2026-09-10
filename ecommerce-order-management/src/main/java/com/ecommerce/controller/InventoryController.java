@@ -2,8 +2,8 @@ package com.ecommerce.controller;
 
 
 
-import com.ecommerce.dto.InventoryResponse;
-import com.ecommerce.dto.UpdateInventoryRequest;
+import com.ecommerce.dto.response.InventoryResponse;
+import com.ecommerce.dto.request.UpdateInventoryRequest;
 import com.ecommerce.service.InventoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
