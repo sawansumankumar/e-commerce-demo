@@ -27,7 +27,7 @@ public class InventoryService {
         return mapToResponse(inventory);
     }
 
-    public InventoryResponse mapToResponse(Inventory inventory)
+    private InventoryResponse mapToResponse(Inventory inventory)
     {
         InventoryResponse response = new InventoryResponse();
         response.setQuantity(inventory.getQuantity());

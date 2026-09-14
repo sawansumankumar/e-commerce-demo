@@ -12,6 +12,8 @@ import com.ecommerce.repository.OrderRepository;
 import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.repository.UserRepository;
 
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,9 +45,9 @@ public class OrderService {
     @Transactional
     public OrderResponse createOrder(CreateOrderRequest request)
     {
-        User user = userRepository.findById(request.getUserId()).orElseThrow(
-                ()-> new UserNotFoundException("User not found with id:" + request.getUserId()));
-
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(
+                                        "User not found with email: " + email));
         Order order = new Order();
         order.setUser(user);
         order.setStatus(OrderStatus.PENDING);
@@ -118,6 +120,16 @@ public class OrderService {
         Order order = orderRepository.findById(id).orElseThrow(()->
                 new OrderNotFoundException("order not found with id: " + id));
 
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().
+                getAuthorities().stream().anyMatch(authority ->authority.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin && !order.getUser().getEmail().equals(email)) {
+            throw new AccessDeniedException(
+                    "You are not allowed to view this order"
+            );
+        }
+
         OrderResponse response = new OrderResponse();
         response.setOrderId(order.getId());
         response.setStatus(order.getStatus());
@@ -139,12 +151,13 @@ public class OrderService {
         return response;
     }
 
-    public List<OrderResponse> getOrdersByUserId(Long userId)
+    public List<OrderResponse> getMyOrders()
     {
-        userRepository.findById(userId).orElseThrow(()->
-                new UserNotFoundException("User not found with id:" + userId));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(
+                                "User not found with email: " + email));
 
-        List<Order> orders = orderRepository.findByUserId(userId);
+        List<Order> orders = orderRepository.findByUserId(user.getId());
         List<OrderResponse> responses = new ArrayList<>();
 
         for(Order order : orders)
@@ -159,6 +172,7 @@ public class OrderService {
     private OrderResponse mapToResponse(Order order)
     {
         OrderResponse response = new OrderResponse();
+        response.setUserID(order.getUser().getId());
         response.setOrderId(order.getId());
         response.setStatus(order.getStatus());
         response.setTotalAmount(order.getTotalAmount());
@@ -182,6 +196,7 @@ public class OrderService {
 
     public OrderResponse updateOrderStatus(Long id, UpdateOrderStatusRequest request)
     {
+
         Order order = orderRepository.findById(id).orElseThrow(()-> new OrderNotFoundException("Order not found with id:" + id));
         if(!isValidStatusTransition(order.getStatus(), request.getStatus()))
         {
@@ -219,6 +234,19 @@ public class OrderService {
             }
 
             return false;
+    }
+
+    public List<OrderResponse> getAllOrders() {
+
+        List<Order> orders = orderRepository.findAll();
+
+        List<OrderResponse> responses = new ArrayList<>();
+
+        for (Order order : orders) {
+            responses.add(mapToResponse(order));
+        }
+
+        return responses;
     }
 
 

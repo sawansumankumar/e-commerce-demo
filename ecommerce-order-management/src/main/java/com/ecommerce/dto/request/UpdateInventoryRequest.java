@@ -13,5 +13,5 @@ public class UpdateInventoryRequest {
 
     @NotNull
     @PositiveOrZero
-    private int quantity;
+    private Integer quantity;
 }

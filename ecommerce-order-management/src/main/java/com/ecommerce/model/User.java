@@ -3,13 +3,12 @@ package com.ecommerce.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 
 
 @Getter
@@ -37,13 +36,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     private String city;
     private String mobile;

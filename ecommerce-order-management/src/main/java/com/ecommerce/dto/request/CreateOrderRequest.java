@@ -12,8 +12,6 @@ import java.util.List;
 @Setter
 public class CreateOrderRequest {
 
-    @NotNull
-    private Long userId;
 
     @NotEmpty
     @Valid

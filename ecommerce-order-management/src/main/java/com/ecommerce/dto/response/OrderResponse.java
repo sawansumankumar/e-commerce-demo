@@ -11,6 +11,7 @@ import java.util.List;
 @Setter
 public class OrderResponse {
 
+    private Long userID;
     private Long orderId;
     private OrderStatus status;
     private BigDecimal totalAmount;

@@ -26,7 +26,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-   @PostMapping("/api/orders")
+   @PostMapping
     public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request)
    {
        OrderResponse response = orderService.createOrder(request);
@@ -41,10 +41,10 @@ public class OrderController {
        return ResponseEntity.ok(response);
    }
 
-   @GetMapping("/user/{userId}")
-    public ResponseEntity<List<OrderResponse>> getOrdersByUserId(@PathVariable Long userId)
+   @GetMapping("/my-orders")
+    public ResponseEntity<List<OrderResponse>> getMyOrders()
    {
-       List<OrderResponse> responses = orderService.getOrdersByUserId(userId);
+       List<OrderResponse> responses = orderService.getMyOrders();
        return ResponseEntity.ok(responses);
 
    }
@@ -55,4 +55,5 @@ public class OrderController {
        OrderResponse response = orderService.updateOrderStatus(id, request);
        return ResponseEntity.ok(response);
    }
+
 }
