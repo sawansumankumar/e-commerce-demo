@@ -13,6 +13,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class AuthService {
 
@@ -32,12 +34,25 @@ public class AuthService {
 
     public UserResponse register(RegisterRequest request)
     {
-        if(userRepository.existsByEmail(request.getEmail()))
+        String email = request.getEmail().trim().toLowerCase();
+        Optional<User> existingUser = userRepository.findByEmail(email);
+        if(existingUser.isPresent() && existingUser.get().isActive())
         {
             throw new EmailAlreadyExistsException("The provided email is already registered");
         }
 
-        User user = new User();
+        User user;
+        if(existingUser.isPresent())
+        {
+            user =existingUser.get();
+            user.setActive(true);
+        }
+
+        else
+        {
+            user = new User();
+        }
+        
         user.setName(request.getName());
         user.setEmail(request.getEmail().trim().toLowerCase());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));

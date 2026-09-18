@@ -15,7 +15,7 @@ import java.util.Date;
 public class JwtService
 {
 
-    private static final String SECRET_KEY = "my-super-secret-key-for-jwt-token-generation";
+    private static final String SECRET_KEY = "my-secret-key-for-jwt-token-generation";
 
     public String generateToken(String email)
     {

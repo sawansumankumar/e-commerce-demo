@@ -44,5 +44,8 @@ public class User {
     private String mobile;
     private LocalDate dob;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
 
 }

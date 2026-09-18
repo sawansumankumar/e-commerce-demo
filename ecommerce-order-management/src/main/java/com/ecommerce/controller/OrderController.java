@@ -2,11 +2,8 @@ package com.ecommerce.controller;
 
 
 import com.ecommerce.dto.request.CreateOrderRequest;
-import com.ecommerce.dto.request.OrderItemRequest;
 import com.ecommerce.dto.request.UpdateOrderStatusRequest;
-import com.ecommerce.dto.response.OrderItemResponse;
 import com.ecommerce.dto.response.OrderResponse;
-import com.ecommerce.model.OrderStatus;
 import com.ecommerce.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -30,7 +27,7 @@ public class OrderController {
     public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request)
    {
        OrderResponse response = orderService.createOrder(request);
-       return ResponseEntity.status(HttpStatus.CREATED).body(response);
+       return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
 
    }
 

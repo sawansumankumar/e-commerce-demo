@@ -63,6 +63,9 @@ public class SecurityConfig
                         .requestMatchers(HttpMethod.PATCH, "/api/orders/**")
                         .hasRole("ADMIN")
 
+                        .requestMatchers(HttpMethod.GET, "/api/users/me")
+                        .hasAnyRole("CUSTOMER", "ADMIN")
+
                         .anyRequest()
                         .authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

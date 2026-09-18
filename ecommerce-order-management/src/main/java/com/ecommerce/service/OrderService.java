@@ -5,6 +5,7 @@ import com.ecommerce.dto.request.OrderItemRequest;
 import com.ecommerce.dto.request.UpdateOrderStatusRequest;
 import com.ecommerce.dto.response.OrderItemResponse;
 import com.ecommerce.dto.response.OrderResponse;
+import com.ecommerce.event.OrderSubmittedEvent;
 import com.ecommerce.exception.*;
 import com.ecommerce.model.*;
 import com.ecommerce.repository.InventoryRepository;
@@ -12,6 +13,7 @@ import com.ecommerce.repository.OrderRepository;
 import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.repository.UserRepository;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 @Service
 public class OrderService {
@@ -28,17 +31,18 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
-    private final InventoryRepository inventoryRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
 
 
     public OrderService(OrderRepository orderRepository, UserRepository userRepository,
-                        ProductRepository productRepository, InventoryRepository inventoryRepository)
+                        ProductRepository productRepository, InventoryRepository inventoryRepository, ExecutorService orderExecutorService,
+                        OrderProcessor orderProcessor, OrderStatusService orderStatusService, ApplicationEventPublisher eventPublisher)
     {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
-        this.inventoryRepository = inventoryRepository;
+        this.eventPublisher = eventPublisher;
 
     }
 
@@ -61,19 +65,6 @@ public class OrderService {
             Product product = productRepository.findById(item.getProductId()).orElseThrow(()->
                     new ProductNotFoundException("Product not found with id:" + item.getProductId()));
 
-            int updatedRows = inventoryRepository.decreaseStock(
-                    item.getProductId(),
-                    item.getQuantity()
-            );
-
-            if (updatedRows == 0)
-            {
-                throw new InsufficientStockException(
-                        "Insufficient stock for product id: " + item.getProductId()
-                );
-            }
-
-            //inventory.setQuantity(inventory.getQuantity() - item.getQuantity());
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setProduct(product);
@@ -88,28 +79,25 @@ public class OrderService {
         order.setTotalAmount(totalAmount);
 
         Order savedOrder = orderRepository.save(order);
+        eventPublisher.publishEvent(
+                new OrderSubmittedEvent(savedOrder.getId())
+        );
 
-       /* OrderResponse response = new OrderResponse();
-        response.setOrderId(savedOrder.getId());
-        response.setStatus(savedOrder.getStatus());
-        response.setTotalAmount(savedOrder.getTotalAmount());
+//        orderExecutorService.submit(()->
+//        {
+//            try
+//            {
+//                orderProcessor.processOrder(savedOrder.getId());
+//                orderStatusService.updateStatus(savedOrder.getId(), OrderStatus.CONFIRMED);
+//            }
+//
+//            catch (Exception ex)
+//            {
+//                orderStatusService.updateStatus(savedOrder.getId(), OrderStatus.FAILED);
+//            }
+//
+//        });
 
-        List<OrderItemResponse> itemResponses = new ArrayList<>();
-        for (OrderItem orderItem : orderItems)
-        {
-            OrderItemResponse itemResponse = new OrderItemResponse();
-            itemResponse.setProductName(orderItem.getProduct().getName());
-            itemResponse.setQuantity(orderItem.getQuantity());
-            itemResponse.setUnitPrice(orderItem.getUnitPrice());
-            itemResponse.setSubtotal(orderItem.getSubtotal());
-
-            itemResponses.add(itemResponse);
-        }
-
-
-
-        response.setItems(itemResponses);
-        return response; */
 
         return mapToResponse(savedOrder);
 
@@ -131,6 +119,7 @@ public class OrderService {
         }
 
         OrderResponse response = new OrderResponse();
+        response.setUserID(order.getUser().getId());
         response.setOrderId(order.getId());
         response.setStatus(order.getStatus());
         response.setTotalAmount(order.getTotalAmount());
@@ -200,11 +189,8 @@ public class OrderService {
         Order order = orderRepository.findById(id).orElseThrow(()-> new OrderNotFoundException("Order not found with id:" + id));
         if(!isValidStatusTransition(order.getStatus(), request.getStatus()))
         {
-            throw new InvalidOrderStatusTransitionException(
-                    "Cannot change order status from "
-                            + order.getStatus()
-                            + " to "
-                            + request.getStatus()
+            throw new InvalidOrderStatusTransitionException("Cannot change order status from " + order.getStatus()
+                            + " to " + request.getStatus()
             );
         }
         order.setStatus(request.getStatus());
@@ -230,6 +216,7 @@ public class OrderService {
 
                 case DELIVERED:
                 case CANCELLED:
+                case FAILED:
                     return false;
             }
 
