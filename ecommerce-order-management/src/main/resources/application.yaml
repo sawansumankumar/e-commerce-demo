@@ -3,8 +3,8 @@ spring:
     name: ecommerce-order-management
 
   datasource:
-    url: jdbc:mysql://localhost:3306/ecommerce_order_mgmt
-    username: root
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
     jwt:
