@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class OrderProcessor {
 
-    private OrderRepository orderRepository;
-    private InventoryRepository inventoryRepository;
+    private final OrderRepository orderRepository;
+    private final InventoryRepository inventoryRepository;
 
     public OrderProcessor(OrderRepository orderRepository, InventoryRepository inventoryRepository)
     {

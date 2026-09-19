@@ -46,8 +46,9 @@ public class OrderEventListener {
 
             catch (Exception ex)
             {
-                orderStatusService.updateStatus(orderId, OrderStatus.FAILED);
                 log.error("Order {} processing failed", orderId, ex);
+                orderStatusService.updateStatus(orderId, OrderStatus.FAILED);
+
             }
 
         });

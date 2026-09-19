@@ -3,6 +3,7 @@ package com.ecommerce.service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -15,11 +16,18 @@ import java.util.Date;
 public class JwtService
 {
 
-    private static final String SECRET_KEY = "my-secret-key-for-jwt-token-generation";
+    private final String secretKey;
+
+    public JwtService(@Value("${jwt.secret}") String secretKey)
+    {
+        this.secretKey = secretKey;
+    }
 
     public String generateToken(String email)
     {
-        return Jwts.builder().subject(email).issuedAt(new Date(System.currentTimeMillis())).expiration(new Date(System.currentTimeMillis()
+        return Jwts.builder().subject(email)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis()
         + 1000*60*60)).signWith(getKey()).compact();
     }
 
@@ -51,7 +59,7 @@ public class JwtService
     private SecretKey getKey()
     {
         return Keys.hmacShaKeyFor(
-            SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+            secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
 

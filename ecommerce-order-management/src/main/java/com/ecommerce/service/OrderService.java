@@ -8,7 +8,6 @@ import com.ecommerce.dto.response.OrderResponse;
 import com.ecommerce.event.OrderSubmittedEvent;
 import com.ecommerce.exception.*;
 import com.ecommerce.model.*;
-import com.ecommerce.repository.InventoryRepository;
 import com.ecommerce.repository.OrderRepository;
 import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.repository.UserRepository;
@@ -22,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 @Service
 public class OrderService {
@@ -36,8 +34,7 @@ public class OrderService {
 
 
     public OrderService(OrderRepository orderRepository, UserRepository userRepository,
-                        ProductRepository productRepository, InventoryRepository inventoryRepository, ExecutorService orderExecutorService,
-                        OrderProcessor orderProcessor, OrderStatusService orderStatusService, ApplicationEventPublisher eventPublisher)
+                        ProductRepository productRepository, ApplicationEventPublisher eventPublisher)
     {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
