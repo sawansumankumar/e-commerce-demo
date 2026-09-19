@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: ecommerce-order-management
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/ecommerce_order_mgmt
+    username: root
+    password: ${DB_PASSWORD}
