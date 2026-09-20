@@ -1,13 +1,13 @@
 package com.ecommerce.controller;
 
 
+import com.ecommerce.dto.response.AdminInventoryResponse;
 import com.ecommerce.dto.response.AdminUserResponse;
 import com.ecommerce.dto.response.OrderResponse;
-import com.ecommerce.dto.response.UserResponse;
+import com.ecommerce.service.InventoryService;
 import com.ecommerce.service.OrderService;
 import com.ecommerce.service.UserService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +19,13 @@ public class AdminController
 {
     private final OrderService orderService;
     private final UserService userService;
+    private final InventoryService inventoryService;
 
-    public AdminController(OrderService orderService, UserService userService)
+    public AdminController(OrderService orderService, UserService userService, InventoryService inventoryService)
     {
         this.orderService = orderService;
         this.userService = userService;
+        this.inventoryService =inventoryService;
     }
 
     @GetMapping("/test")
@@ -65,6 +67,17 @@ public class AdminController
     {
         userService.activateUserByAdmin(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/inventory")
+    public ResponseEntity<Page<AdminInventoryResponse>> getAllInventory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+
+        Page<AdminInventoryResponse> inventory =
+                inventoryService.getAllInventoryForAdmin(page, size);
+
+        return ResponseEntity.ok(inventory);
     }
 
 }
