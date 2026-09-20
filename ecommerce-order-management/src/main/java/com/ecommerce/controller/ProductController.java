@@ -88,5 +88,12 @@ public class ProductController
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/api/products/bulk")
+    public ResponseEntity<List<ProductResponse>> createProducts(@Valid @RequestBody List<@Valid CreateProductRequest> requests)
+    {
+        List<ProductResponse> responses = productService.createProducts(requests);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+    }
+
 
 }

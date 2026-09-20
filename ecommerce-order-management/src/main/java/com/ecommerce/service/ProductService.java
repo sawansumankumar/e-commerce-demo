@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.ArrayList;
@@ -175,6 +176,19 @@ public class ProductService {
         Pageable pageable = PageRequest.of(page, size);
         Page<Product> products = productRepository.findAll(pageable);
         Page<ProductResponse> responses = products.map(product -> mapToResponse(product));
+        return responses;
+    }
+
+    @Transactional
+    public List<ProductResponse> createProducts(List<CreateProductRequest> requests)
+    {
+        List<ProductResponse> responses = new ArrayList<>();
+        for(CreateProductRequest request : requests)
+        {
+            ProductResponse response = createProduct(request);
+            responses.add(response);
+        }
+
         return responses;
     }
 
